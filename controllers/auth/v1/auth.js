@@ -1,9 +1,6 @@
 const { validationResult } = require('express-validator');
-const db = require('../../../utils/db_auth');
+const db = require('../../../utils/db_apiVT');
 const jwt = require('jsonwebtoken');
-const ip = require('my-local-ip')()
-
-
 
 
 exports.loginUser = async(req, res) => {
@@ -12,43 +9,34 @@ exports.loginUser = async(req, res) => {
     if (!errors.isEmpty()) {
         return res.status(422).json({
             message: 'Errore formato dato',
-            customcode: '4222',
             error: errors.array()
         });
     }
 
-
-    const user = req.body.user;
+    const user = req.body.username;
     const password = req.body.password;
-
-    //const ipSrv = req.ipInfo;
-
 
     let rows;
     const env = process.env.NODE_ENV;
 
     try {
-        //[rows] = await db.execute('select USER, PASSWORD, ID from TB_USER where ATTIVO = 1 and USER = ? and PASSWORD = ? and SERVER = ?', [user, password, env]);
-        [rows] = await db.execute('select TB_USER.USER, TB_USER.PASSWORD, TB_USER.ID, TB_ENTE.CODICE_ENTE from TB_USER, TB_ENTE where TB_USER.ID_ENTE = TB_ENTE.ID and ATTIVO = 1 and USER = ? and PASSWORD = ? and SERVER = ?', [user, password, env]);
-
+        [rows] = await db.execute('select * from aauth_users where username = ? and pass = ?', [user, password]);
     } catch (error) {
         return res.status(422).json({
             messageError: 'error login!',
-            errore: error,
-            customcode: '4220'
+            errore: error
         });
     }
     if (!rows.length) {
         return res.status(401).json({
             status: false,
-            message: 'Utenza non autorizzata ',
-            customcode: '4001'
+            message: 'Utenza non autorizzata '
         });
     }
     const token = jwt.sign({
             id: rows[0].id,
-            user: rows[0].user,
-            codice_ente: rows[0].CODICE_ENTE
+            username: rows[0].username,
+            email: rows[0].email
         },
         process.env.JWT_KEY, { expiresIn: '1h' }
     );
@@ -56,11 +44,8 @@ exports.loginUser = async(req, res) => {
     return res.status(200).json({
         status: true,
         message: 'Success',
-        customcode: '2000',
         token,
         env
-        //ipSrv
-        //counter
     });
 
 
@@ -71,44 +56,44 @@ exports.loginUser = async(req, res) => {
 
 
 
-exports.visibilita = async(req, res) => {
+// exports.visibilita = async(req, res) => {
 
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(422).json({
-            message: 'Errore formato dato',
-            customcode: '4222',
-            error: errors.array()
-        });
-    }
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//         return res.status(422).json({
+//             message: 'Errore formato dato',
+//             customcode: '4222',
+//             error: errors.array()
+//         });
+//     }
 
-    const user = req.body.user;
-    let rows;
+//     const user = req.body.user;
+//     let rows;
 
-    try {
-        [rows] = await db.execute('select * from visibilita_ambito_user where USER = ?', [user]);
-    } catch (error) {
-        return res.status(422).json({
-            messageError: 'error login!',
-            errore: error
-        });
-    }
+//     try {
+//         [rows] = await db.execute('select * from visibilita_ambito_user where USER = ?', [user]);
+//     } catch (error) {
+//         return res.status(422).json({
+//             messageError: 'error login!',
+//             errore: error
+//         });
+//     }
 
-    if (!rows.length) {
-        return res.status(401).json({
-            status: false,
-            message: 'Utenza non trovata! '
-        });
-    }
+//     if (!rows.length) {
+//         return res.status(401).json({
+//             status: false,
+//             message: 'Utenza non trovata! '
+//         });
+//     }
 
 
-    return res.status(200).json({
-        status: true,
-        message: 'Success!',
-        userLog: rows
-    });
+//     return res.status(200).json({
+//         status: true,
+//         message: 'Success!',
+//         userLog: rows
+//     });
 
-};
+// };
 
 /* exports.registerUser = async(req, res) => {
 
