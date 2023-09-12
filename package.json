@@ -1,0 +1,25 @@
+{
+    "name": "restapi",
+    "version": "1.0.0",
+    "description": "restapi",
+    "main": "app.js",
+    "scripts": {
+        "start": "pm2 start ecosystem.config.js && pm2 log 0",
+        "stop": "pm2 delete ecosystem.config.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Di Fiori Tiziano",
+    "license": "ISC",
+    "dependencies": {
+        "body-parser": "^1.19.0",
+        "cors": "^2.8.5",
+        "express": "^4.17.1",
+        "express-validator": "^6.5.0",
+        "helmet": "^3.22.0",
+        "ical": "^0.8.0",
+        "ical-generator": "^3.6.1",
+        "jsonwebtoken": "^8.5.1",
+        "mysql2": "^2.1.0",
+        "yamljs": "^0.3.0"
+    }
+}
